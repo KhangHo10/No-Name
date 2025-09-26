@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+
+# Env
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend folder (optional)
+/backend/.venv/

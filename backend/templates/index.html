@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADK Voice Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+      background: #0078d7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    #status {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #444;
+      white-space: pre-wrap;
+      text-align: left;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>ADK Voice Payment</h1>
+  <p>Click the button and say something like:<br>
+     <em>"Pay 20 dollars"</em>
+  </p>
+  <button onclick="startVoice()">🎤 Pay with Voice</button>
+  <p id="status">Awaiting voice input...</p>
+
+  <script>
+    function startVoice() {
+      if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+        document.getElementById('status').innerText = 'Web Speech API not supported in this browser.';
+        return;
+      }
+
+      const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onstart = () => {
+        document.getElementById("status").innerText = "Listening...";
+      };
+
+      recognition.onresult = async (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("status").innerText = "You said: " + transcript + "\n\nSending to server...";
+
+        try {
+          const res = await fetch("/process_voice", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: transcript })
+          });
+          const data = await res.json();
+          // show the full JSON response; if your backend includes a message field it will appear here
+          document.getElementById("status").innerText = "Server Response:\n" + JSON.stringify(data, null, 2);
+        } catch (err) {
+          document.getElementById("status").innerText = "Error sending to server: " + String(err);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        document.getElementById("status").innerText = "Error: " + event.error;
+      };
+    }
+  </script>
+</body>
+</html>

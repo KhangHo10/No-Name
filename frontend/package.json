@@ -1,0 +1,9 @@
+{
+  "name": "voice-payment-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "serve -s public",
+    "build": "echo \"Add your build step here\""
+  }
+}
